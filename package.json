@@ -15,6 +15,7 @@
     "nuxt": "^3.12.4"
   },
   "dependencies": {
+    "@neoconfetti/vue": "^2.2.1",
     "@vueuse/nuxt": "^10.11.0"
   }
 }

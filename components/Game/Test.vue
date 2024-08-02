@@ -1,7 +1,8 @@
 <template>
-  <div class="p-4">
+<div class="p-4">
+  <div class=" h-[600px] bg-slate-600 max-w-[600px] overflow-auto">
     <div class="flex flex-col gap-4 max-w-[500px]">
-      <div class="space-y-2">
+      <div class="space-y-2 sticky p-2 top-0 bg-slate-600 ">
         <h2>Guess the number</h2>
         <div class="flex gap-4">
           <MyInput v-for="(_, index) in numberOfFields" :key="index" :id="`${playerGuessedNumberId}-input-${index}`"
@@ -12,14 +13,14 @@
           <UButton @click="submitplayerGuessedNumber" size="xl" block>Submit</UButton>
         </div>
       </div>
-      <div class="space-y-2">
+      <div class="space-y-2 p-2">
         <h2>Previous Guesses</h2>
         <div class="flex gap-2 justify-between">
           <div class="flex gap-4 flex-col">
             <p><strong>Player's Guesses</strong></p>
-            <div v-for="(guess, index) in playerGuesses" :key="index">
+            <div class="text-xl" v-for="(guess, index) in playerGuesses" :key="index">
               <div>{{ guess.guessedNumber }}</div>
-              <div>Dead: {{ guess.dead }}, Injured: {{ guess.injured }}</div>
+              <div>Dead: <span class="text-primary font-bold">{{ guess.dead }}</span>, Injured: <span class="text-lime-300 font-medium">{{ guess.injured }}</span></div>
             </div>
           </div>
         </div>
@@ -28,6 +29,7 @@
 
 
   </div>
+</div>
 </template>
 
 <script lang="ts" setup>

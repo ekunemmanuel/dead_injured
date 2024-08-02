@@ -1,15 +1,6 @@
 <template>
-  <UInput
-    :id="id"
-    type="text"
-    class="otp-input"
-    size="xl"
-    maxlength="1"
-    v-model="text"
-    @input="onInput"
-    @keypress="isNumber"
-    @keydown="onKeydown"
-  />
+  <UInput :id="id" type="text" size="xl" maxlength="1" v-model="text" @input="onInput" @keypress="isNumber"
+    @keydown="onKeydown" input-class="text-center" />
 </template>
 
 <script lang="ts" setup>
@@ -43,5 +34,4 @@ function onKeydown(event: KeyboardEvent) {
 
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

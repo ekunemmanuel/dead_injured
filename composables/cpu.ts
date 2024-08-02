@@ -1,28 +1,14 @@
 
 export function useCpu() {
-  const { numberOfFields, focusFirstInput, hasStarted } = useGeneral();
+  const { numberOfFields, hasStarted } = useGeneral();
   const cpuNumber = ref<string[]>(generateUniqueCpuNumber());
-  const cpuPreviousGuesses = ref<{
-    guessedNumber: string;
-    dead: number;
-    injured: number;
-  }[]>([]);
+  const cpuPreviousGuesses = ref<{ guessedNumber: string; dead: number; injured: number }[]>([]);
+  const playerNumber = ref<string[]>(Array(numberOfFields).fill(''));
 
-  const playerNumber = ref<string[]>(Array(4).fill(''));
+  // const storeCpuNumber = useLocalStorage('cpu-number', [''] as string[]); // key and default value
+  // storeCpuNumber.value = cpuNumber.value;
 
-  const storeCpuNumber = useLocalStorage(
-    'cpu-number', // key
-    [''] as string[], // default value
-  )
-
-  storeCpuNumber.value = cpuNumber.value;
-
-
-  const storeCpuPreviousGuesses = useLocalStorage(
-    'cpu-previous-guesses', // key
-    [] as { guessedNumber: string; dead: number; injured: number }[], // default value
-  );
-
+  const storeCpuPreviousGuesses = useLocalStorage('cpu-previous-guesses', [] as { guessedNumber: string; dead: number; injured: number }[]); // key and default value
   storeCpuPreviousGuesses.value = [...cpuPreviousGuesses.value];
 
   const cpuGuesses = computed(() => storeCpuPreviousGuesses.value.length === 0 ? cpuPreviousGuesses.value : storeCpuPreviousGuesses.value);
@@ -30,15 +16,11 @@ export function useCpu() {
   function generateUniqueCpuNumber(): string[] {
     const digits = '0123456789'.split('');
     const cpuNum: string[] = [];
-
     while (cpuNum.length < numberOfFields) {
       const randomIndex = Math.floor(Math.random() * digits.length);
       const digit = digits.splice(randomIndex, 1)[0];
       cpuNum.push(digit);
     }
-
-
-
     return cpuNum;
   }
 
@@ -51,15 +33,15 @@ export function useCpu() {
     for (let i = 0; i < numberOfFields; i++) {
       if (guessCopy[i] === playerNumberCopy[i]) {
         deadCount++;
-        guessCopy[i] = ''; // Mark this digit as matched
-        playerNumberCopy[i] = ''; // Mark this digit as matched
+        guessCopy[i] = '';
+        playerNumberCopy[i] = '';
       }
     }
 
     for (let i = 0; i < numberOfFields; i++) {
       if (guessCopy[i] !== '' && playerNumberCopy.includes(guessCopy[i])) {
         injuredCount++;
-        playerNumberCopy[playerNumberCopy.indexOf(guessCopy[i])] = ''; // Remove this digit from the player's number
+        playerNumberCopy[playerNumberCopy.indexOf(guessCopy[i])] = '';
       }
     }
 
@@ -67,15 +49,7 @@ export function useCpu() {
   }
 
   function makeCpuGuess() {
-    // Generate a guess based on previous results
-    let guess = generateUniqueCpuNumber(); // For now, we generate a random guess
-
-    if (cpuPreviousGuesses.value.length > 0) {
-      // Implement logic to learn from previous guesses
-      // For simplicity, we use random guess here, but you can implement more sophisticated logic
-      // such as narrowing down the guess based on previous dead and injured counts.
-    }
-
+    const guess = generateUniqueCpuNumber(); // Simplified guessing logic for example purposes
     const { dead, injured } = evaluateCpuGuess(guess);
 
     cpuPreviousGuesses.value.unshift({
@@ -91,16 +65,13 @@ export function useCpu() {
       storeCpuPreviousGuesses.value = [];
       hasStarted.value = false;
     } else {
-      alert(`CPU Guess: ${guess.join('')}, Dead: ${dead}, Injured: ${injured}`);
+      alert(`CPU guessed: ${guess.join('')}, Dead: ${dead}, Injured: ${injured}`);
     }
   }
 
   return {
-    numberOfFields,
     cpuNumber,
-    cpuPreviousGuesses,
-    cpuGuesses,
-    makeCpuGuess,
-    playerNumber,
+    // storeCpuNumber,
+    generateUniqueCpuNumber
   };
 }
