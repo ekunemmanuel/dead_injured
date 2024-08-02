@@ -1,76 +1,81 @@
 <template>
-<div class="p-4">
-  <div class=" h-[600px] bg-slate-600 max-w-[600px] overflow-auto">
-    <div class="flex flex-col gap-4 max-w-[500px]">
-      <div class="space-y-2 sticky p-2 top-0 bg-slate-600 ">
-        <h2>Guess the number</h2>
-        <div class="flex gap-4">
-          <MyInput v-for="(_, index) in numberOfFields" :key="index" :id="`${playerGuessedNumberId}-input-${index}`"
-            v-model="playerGuessedNumber[index]" @incoming="(v) => handleGuessedInput(v, index)"
-            @onKeyDown="onKeydown" />
+  <div class=" space-y-2">
+    <div v-if="hasWon" v-confetti="{ duration: 5000 }" />
+    <div class="flex justify-between">
+      <small v-if="hasWon" class="block">
+        You Won. A new game start in
+        <span :class="[counter < 3 ? 'text-red-300' : 'text-primary']" class="animate-pulse">
+          {{ counter }}
+        </span>
+      </small>
+      <span>
+        {{ gameStartedTimer }}
+      </span>
+    </div>
+
+    <div class="bg-gray-700/40 overflow-auto rounded-md shadow-xl duration-300"
+      :class="[playerGuesses.length > 0 ? 'h-[400px]' : 'h-[148px]']">
+      <div class="flex flex-col gap-4">
+        <div class="space-y-2 sticky p-2 top-0 bg-gray-700">
+          <h2>Guess the number</h2>
+          <div class="flex gap-4">
+            <MyInput v-for="(_, index) in numberOfFields" :key="index" :id="`${playerGuessedNumberId}-input-${index}`"
+              v-model="playerGuessedNumber[index]" @incoming="(v) => handleGuessedInput(v, index)"
+              @onKeyDown="onKeydown" />
+          </div>
+          <div class="flex gap-4">
+            <div v-if="!hasWon" class="flex-1">
+              <UButton @click="submitPlayerGuessedNumber" size="xl" block>Submit</UButton>
+            </div>
+            <div v-else class="flex flex-1 gap-4">
+              <div class="flex-1">
+                <UButton @click="startNewGame" size="xl" block>New Game</UButton>
+              </div>
+              <div class="flex-1">
+                <UButton @click="cancelNewGame" size="xl" block>Cancel</UButton>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="self- ">
-          <UButton @click="submitplayerGuessedNumber" size="xl" block>Submit</UButton>
-        </div>
-      </div>
-      <div class="space-y-2 p-2">
-        <h2>Previous Guesses</h2>
-        <div class="flex gap-2 justify-between">
-          <div class="flex gap-4 flex-col">
-            <p><strong>Player's Guesses</strong></p>
-            <div class="text-xl" v-for="(guess, index) in playerGuesses" :key="index">
-              <div>{{ guess.guessedNumber }}</div>
-              <div>Dead: <span class="text-primary font-bold">{{ guess.dead }}</span>, Injured: <span class="text-lime-300 font-medium">{{ guess.injured }}</span></div>
+        <div class="space-y-2 p-2" v-if="playerGuesses.length > 0">
+          <h2>Previous Guesses</h2>
+          <div class="flex gap-2 justify-between">
+            <div class="flex gap-4 flex-col">
+              <p><strong>Player's Guesses</strong></p>
+              <div v-for="(guess, index) in playerGuesses" :key="index">
+                <div>{{ guess.guessedNumber }}</div>
+                <div>
+                  Dead:
+                  <span class="text-primary font-bold">{{ guess.dead }}</span>, Injured:
+                  <span class="text-lime-300 font-medium">{{
+                    guess.injured
+                    }}</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-
-
   </div>
-</div>
 </template>
 
 <script lang="ts" setup>
-
-const { handleBackspace, moveToNext, moveToPrevious, numberOfFields, hasStarted } = useGeneral();
-const { playerNumberId, playerGuessedNumberId, playerNumber, playerGuessedNumber, isPlayerNumberValid, isPlayerGuessedNumberValid, handleGuessedInput, handlePlayerInput, submitplayerGuessedNumber, playerGuesses, storePlayerNumber } = usePlayer();
-
-
-function onKeydown(event: KeyboardEvent) {
-  const target = event.target as HTMLInputElement;
-  const index = parseInt(target.id.split('-').pop() as string);
-  const inputPrefix = target.id.includes(playerNumberId) ? playerNumberId : playerGuessedNumberId;
-  const numberArray = target.id.includes(playerNumberId) ? playerNumber : playerGuessedNumber;
-
-  if (event.key === 'Backspace') {
-    if (numberArray.value[index] === '') {
-      handleBackspace(index, numberArray, inputPrefix);
-      event.preventDefault();
-    }
-  } else if (event.key === 'Enter' && isPlayerGuessedNumberValid.value) {
-    submitplayerGuessedNumber();
-  } else if (event.key === 'ArrowLeft') {
-    moveToPrevious(index, inputPrefix);
-  } else if (event.key === 'ArrowRight') {
-    moveToNext(index, numberArray, inputPrefix);
-  }
-}
-
-// function startGame() {
-
-//   if (isPlayerNumberValid.value) {
-//     hasStarted.value = true;
-//     focusFirstInput(playerGuessedNumberId);
-//     storePlayerNumber.value = playerNumber.value;
-//     console.log('Player number:', playerNumber.value);
-
-//   } else {
-//     alert('Please fill in all fields before starting the game.');
-//   }
-// }
-
+import { vConfetti } from "@neoconfetti/vue";
+const {
+  gameStartedTimer,
+  onKeydown,
+  handleGuessedInput,
+  playerGuesses,
+  numberOfFields,
+  playerGuessedNumberId,
+  playerGuessedNumber,
+  submitPlayerGuessedNumber,
+  cancelNewGame,
+  startNewGame,
+  counter,
+  hasWon,
+} = useGameLogic();
 </script>
 
 <style scoped></style>
